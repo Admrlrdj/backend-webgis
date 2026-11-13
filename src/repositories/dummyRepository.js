@@ -121,7 +121,13 @@ module.exports = {
   },
 
   async getDatasetMeta(indicatorId, year) {
-    return datasetMeta.get(`${indicatorId}:${year}`) || null;
+    if (year) return datasetMeta.get(`${indicatorId}:${year}`) || null;
+    const years = [...datasetMeta.keys()]
+      .filter((k) => k.startsWith(`${indicatorId}:`))
+      .map((k) => Number(k.split(':')[1]))
+      .sort((a, b) => b - a);
+    if (!years.length) return null;
+    return { year: years[0], ...datasetMeta.get(`${indicatorId}:${years[0]}`) };
   },
 
   async listDatasetMeta() {

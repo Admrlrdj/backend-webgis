@@ -9,9 +9,9 @@ const FACILITY_TYPES = ['market', 'water_facility', 'puskesmas', 'posyandu', 'ag
 
 // is_dummy mengikuti datanya (kolom is_dummy per wilayah), bukan jenis repository,
 // supaya data dummy yang sudah diimport ke PostGIS tetap ditandai dummy
-const baseMeta = (features) => ({
+const baseMeta = (items) => ({
   data_source: repo.kind,
-  is_dummy: features ? features.some((f) => f.properties?.is_dummy) : repo.kind === 'dummy',
+  is_dummy: items ? items.some((f) => (f.properties ? f.properties.is_dummy : f.is_dummy)) : repo.kind === 'dummy',
 });
 
 async function health(_req, res) {
@@ -46,7 +46,11 @@ async function getArea(req, res) {
 async function getIndicator(req, res) {
   const indicator = requireIndicator(req.query.type);
   const year = parseYear(req.query.year);
-  const { year: resolvedYear, featureCollection } = await repo.getAreasGeoJSON({ kecamatan: req.query.kecamatan, year });
+  const [{ year: snapshotYear, featureCollection }, datasetMeta] = await Promise.all([
+    repo.getAreasGeoJSON({ kecamatan: req.query.kecamatan, year }),
+    repo.getDatasetMeta(indicator.id, year || undefined),
+  ]);
+  const resolvedYear = year || datasetMeta?.year || snapshotYear;
 
   const features = featureCollection.features.map((f) => ({
     ...f,
@@ -59,7 +63,6 @@ async function getIndicator(req, res) {
     },
   }));
   const numeric = features.map((f) => f.properties.value).filter((v) => Number.isFinite(v));
-  const datasetMeta = resolvedYear ? await repo.getDatasetMeta(indicator.id, resolvedYear) : null;
 
   res.json({
     data: { type: 'FeatureCollection', features },
@@ -110,7 +113,7 @@ async function getRankings(req, res) {
     skipped: result.skipped,
     year: resolvedYear,
     meta: {
-      ...baseMeta(),
+      ...baseMeta(rows),
       method: 'Simple Additive Weighting (SAW)',
       disclaimer: 'Hasil SAW adalah rekomendasi analitis untuk mendukung keputusan, bukan keputusan otomatis.',
     },

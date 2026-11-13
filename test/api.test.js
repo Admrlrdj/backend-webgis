@@ -158,3 +158,11 @@ test('audit log hanya untuk superadmin', async () => {
   const r = await fetch(`${base}/admin/audit-logs`, { headers: { authorization: `Bearer ${token}` } });
   assert.equal(r.status, 403);
 });
+
+test('normalizeWilayah menyamakan variasi ejaan Bappeda dan FSVA', () => {
+  const { normalizeWilayah } = require('../src/utils/normalize');
+  assert.equal(normalizeWilayah('KEL. BALUMBANGJAYA'), normalizeWilayah('Balungbangjaya'));
+  assert.equal(normalizeWilayah('KEL. KEBON KALAPA'), normalizeWilayah('Kebon Kelapa'));
+  assert.equal(normalizeWilayah('KEL. TEGALEGA'), normalizeWilayah('Tegallega'));
+  assert.equal(normalizeWilayah('KEL. TANAHSEREAL'), normalizeWilayah('Tanah Sareal'));
+});

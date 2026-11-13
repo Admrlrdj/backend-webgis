@@ -2,14 +2,23 @@
  * Normalisasi nama wilayah sebelum join: huruf kecil, buang awalan
  * administratif, tanda baca, dan spasi. "Kel. Tanah Sareal" -> "tanahsareal".
  */
+// Variasi ejaan antar dataset resmi (Bappeda 2014 vs FSVA/BPS) dipetakan ke bentuk kanonik
+const WILAYAH_ALIASES = {
+  balumbangjaya: 'balungbangjaya',
+  kebonkalapa: 'kebonkelapa',
+  tegalega: 'tegallega',
+  tanahsereal: 'tanahsareal',
+};
+
 function normalizeWilayah(name) {
   if (name === undefined || name === null) return '';
-  return String(name)
+  const cleaned = String(name)
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/^\s*(kelurahan|kel\.?|desa|kecamatan|kec\.?)\s+/, '')
     .replace(/[^a-z0-9]/g, '');
+  return WILAYAH_ALIASES[cleaned] || cleaned;
 }
 
 function parseNumber(value) {

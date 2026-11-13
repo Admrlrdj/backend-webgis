@@ -9,6 +9,8 @@
     "generate:dummy": "node scripts/generate-dummy-geojson.js",
     "db:init": "node scripts/db-init.js",
     "db:import": "node scripts/import-geojson.js",
+    "db:import:sig": "node scripts/import-sig.js",
+    "db:import:facilities": "node scripts/import-facilities-shp.js",
     "test": "node --test test/api.test.js",
     "db:configure": "node scripts/configure-db.js"
   },

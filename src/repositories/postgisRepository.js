@@ -5,18 +5,27 @@
 const db = require('../config/db');
 const { INDICATORS } = require('../config/indicators');
 
-// Pivot indikator per area untuk satu tahun -> kolom bernama sesuai properti frontend
+// Pivot indikator per area -> kolom bernama sesuai properti frontend.
+// Jika year diberikan, ambil tepat tahun tersebut; jika tidak, ambil tahun terbaru per (area_id, indicator_type)
+// sehingga indikator lintas periode (mis. Stunting 2024 + FSVA 2025) tetap tergabung utuh.
 const PIVOT_COLUMNS = Object.entries(INDICATORS)
   .map(([id, def]) => `MAX(i.value) FILTER (WHERE i.indicator_type = '${id}')::float AS "${def.key}"`)
   .join(',\n      ');
 
-const AREA_SELECT = `
-  SELECT a.id AS db_id, a.area_code AS id, a.kode_wilayah, a.nama_kelurahan AS nama, a.nama_kecamatan AS kecamatan,
-         ST_Y(ST_PointOnSurface(a.geom)) AS lat, ST_X(ST_PointOnSurface(a.geom)) AS lng, a.is_dummy,
-         ${PIVOT_COLUMNS}
-  FROM administrative_areas a
-  LEFT JOIN indicators i ON i.area_id = a.id AND i.year = $1
-`;
+function areaSelectFor(year) {
+  const joinSource = year
+    ? 'SELECT area_id, indicator_type, value, year FROM indicators WHERE year = $1'
+    : `SELECT DISTINCT ON (area_id, indicator_type) area_id, indicator_type, value, year
+       FROM indicators
+       ORDER BY area_id, indicator_type, year DESC`;
+  return `
+    SELECT a.id AS db_id, a.area_code AS id, a.kode_wilayah, a.nama_kelurahan AS nama, a.nama_kecamatan AS kecamatan,
+           ST_Y(ST_PointOnSurface(a.geom)) AS lat, ST_X(ST_PointOnSurface(a.geom)) AS lng, a.is_dummy,
+           ${PIVOT_COLUMNS}
+    FROM administrative_areas a
+    LEFT JOIN (${joinSource}) i ON i.area_id = a.id
+  `;
+}
 
 async function resolveYear(year) {
   if (year) return year;
@@ -52,14 +61,14 @@ module.exports = {
 
   async getAreasGeoJSON({ kecamatan, year } = {}) {
     const y = await resolveYear(year);
-    const params = [y];
+    const params = year ? [year] : [];
     let where = '';
     if (kecamatan) {
       params.push(kecamatan);
-      where = 'WHERE lower(a.nama_kecamatan) = lower($2)';
+      where = `WHERE lower(a.nama_kecamatan) = lower($${params.length})`;
     }
     const sql = `
-      WITH base AS (${AREA_SELECT} ${where} GROUP BY a.id)
+      WITH base AS (${areaSelectFor(year)} ${where} GROUP BY a.id)
       SELECT b.*, ST_AsGeoJSON(a.geom, 6)::json AS geometry
       FROM base b JOIN administrative_areas a ON a.id = b.db_id
       ORDER BY b.id`;
@@ -75,18 +84,21 @@ module.exports = {
 
   async getAreaById(id, { year } = {}) {
     const y = await resolveYear(year);
+    const params = year ? [year, id] : [id];
+    const idParam = `$${params.length}`;
     const sql = `
-      WITH base AS (${AREA_SELECT} WHERE a.area_code = $2 OR a.kode_wilayah = $2 GROUP BY a.id)
+      WITH base AS (${areaSelectFor(year)} WHERE a.area_code = ${idParam} OR a.kode_wilayah = ${idParam} GROUP BY a.id)
       SELECT b.*, ST_AsGeoJSON(a.geom, 6)::json AS geometry
       FROM base b JOIN administrative_areas a ON a.id = b.db_id`;
-    const { rows } = await db.query(sql, [y, id]);
+    const { rows } = await db.query(sql, params);
     if (!rows.length) return null;
     return { type: 'Feature', id: rows[0].id, properties: rowToProperties(rows[0], y), geometry: rows[0].geometry };
   },
 
   async getIndicatorRows({ year } = {}) {
     const y = await resolveYear(year);
-    const { rows } = await db.query(`${AREA_SELECT} GROUP BY a.id ORDER BY a.area_code`, [y]);
+    const params = year ? [year] : [];
+    const { rows } = await db.query(`${areaSelectFor(year)} GROUP BY a.id ORDER BY a.area_code`, params);
     return { year: y, rows: rows.map((r) => rowToProperties(r, y)) };
   },
 
@@ -116,12 +128,21 @@ module.exports = {
   },
 
   async getDatasetMeta(indicatorId, year) {
+    if (year) {
+      const { rows } = await db.query(
+        `SELECT year, MAX(source) AS source, MAX(updated_at) AS updated_at, MAX(validation_status) AS status_validasi
+         FROM indicators WHERE indicator_type = $1 AND year = $2 GROUP BY year`,
+        [indicatorId, year]
+      );
+      return rows[0] || null;
+    }
     const { rows } = await db.query(
-      `SELECT MAX(source) AS source, MAX(updated_at) AS updated_at, MAX(validation_status) AS status_validasi
-       FROM indicators WHERE indicator_type = $1 AND year = $2`,
-      [indicatorId, year]
+      `SELECT year, MAX(source) AS source, MAX(updated_at) AS updated_at, MAX(validation_status) AS status_validasi
+       FROM indicators WHERE indicator_type = $1
+       GROUP BY year ORDER BY year DESC LIMIT 1`,
+      [indicatorId]
     );
-    return rows[0].updated_at ? rows[0] : null;
+    return rows[0] || null;
   },
 
   async listDatasetMeta() {

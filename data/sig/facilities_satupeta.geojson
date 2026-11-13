@@ -1,0 +1,456 @@
+{
+  "type": "FeatureCollection",
+  "name": "facilities_satupeta_kota_bogor",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.809601,
+          -6.617212
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-01",
+        "facility_code": "FAC-RBI-01",
+        "name": "Fasilitas Kesehatan RBI #1",
+        "facility_type": "puskesmas",
+        "address": "Kel. Bondongan, Kec. Bogor Selatan, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Bondongan",
+        "kecamatan": "Bogor Selatan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8179115,
+          -6.6170982
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-02",
+        "facility_code": "FAC-RBI-02",
+        "name": "Fasilitas Kesehatan RBI #2",
+        "facility_type": "puskesmas",
+        "address": "Kel. Baranangsiang, Kec. Bogor Timur, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Baranangsiang",
+        "kecamatan": "Bogor Timur"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8040358,
+          -6.6106689
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-03",
+        "facility_code": "FAC-RBI-03",
+        "name": "Fasilitas Kesehatan RBI #3",
+        "facility_type": "puskesmas",
+        "address": "Kel. Gudang, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Gudang",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.801002,
+          -6.6122824
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-04",
+        "facility_code": "FAC-RBI-04",
+        "name": "Fasilitas Kesehatan RBI #4",
+        "facility_type": "puskesmas",
+        "address": "Kel. Empang, Kec. Bogor Selatan, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Empang",
+        "kecamatan": "Bogor Selatan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8052325,
+          -6.5986381
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-05",
+        "facility_code": "FAC-RBI-05",
+        "name": "Fasilitas Kesehatan RBI #5",
+        "facility_type": "puskesmas",
+        "address": "Kel. Tegallega, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Tegallega",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7974215,
+          -6.5920241
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-06",
+        "facility_code": "FAC-RBI-06",
+        "name": "Fasilitas Kesehatan RBI #6",
+        "facility_type": "puskesmas",
+        "address": "Kel. Sempur, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Sempur",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7803645,
+          -6.5833416
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-07",
+        "facility_code": "FAC-RBI-07",
+        "name": "Fasilitas Kesehatan RBI #7",
+        "facility_type": "puskesmas",
+        "address": "Kel. Menteng, Kec. Bogor Barat, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Menteng",
+        "kecamatan": "Bogor Barat"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7790467,
+          -6.5820394
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-08",
+        "facility_code": "FAC-RBI-08",
+        "name": "Fasilitas Kesehatan RBI #8",
+        "facility_type": "puskesmas",
+        "address": "Kel. Menteng, Kec. Bogor Barat, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Menteng",
+        "kecamatan": "Bogor Barat"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7774102,
+          -6.5793449
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-09",
+        "facility_code": "FAC-RBI-09",
+        "name": "Fasilitas Kesehatan RBI #9",
+        "facility_type": "puskesmas",
+        "address": "Kel. Menteng, Kec. Bogor Barat, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Menteng",
+        "kecamatan": "Bogor Barat"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.771805,
+          -6.5782601
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-10",
+        "facility_code": "FAC-RBI-10",
+        "name": "Fasilitas Kesehatan RBI #10",
+        "facility_type": "puskesmas",
+        "address": "Kel. Menteng, Kec. Bogor Barat, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Menteng",
+        "kecamatan": "Bogor Barat"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7951338,
+          -6.5716966
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-11",
+        "facility_code": "FAC-RBI-11",
+        "name": "Fasilitas Kesehatan RBI #11",
+        "facility_type": "puskesmas",
+        "address": "Kel. Kebonpedes, Kec. Tanah Sareal, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Kebonpedes",
+        "kecamatan": "Tanah Sareal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8081583,
+          -6.6220153
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-12",
+        "facility_code": "FAC-RBI-12",
+        "name": "Fasilitas Kesehatan RBI #12",
+        "facility_type": "puskesmas",
+        "address": "Kel. Batutulis, Kec. Bogor Selatan, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "KESEHATAN_PT_25K",
+        "remark": "Fasilitas Kesehatan Lainnya",
+        "lcode": "GI0020",
+        "kelurahan": "Batutulis",
+        "kecamatan": "Bogor Selatan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7971879,
+          -6.5910045
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-13",
+        "facility_code": "FAC-RBI-13",
+        "name": "Rumah Sakit Salak Bogor",
+        "facility_type": "puskesmas",
+        "address": "Kel. Sempur, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "RUMAHSAKIT_PT_25K",
+        "remark": "Rumah Sakit Umum",
+        "lcode": "GI0020",
+        "kelurahan": "Sempur",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7985279,
+          -6.6037816
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-14",
+        "facility_code": "FAC-RBI-14",
+        "name": "Sentra Niaga / Pasar RBI #1",
+        "facility_type": "market",
+        "address": "Kel. Gudang, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "NIAGA_PT_25K",
+        "remark": "Pusat Bisnis dan Perdagangan Lainnya",
+        "lcode": "GB0020",
+        "kelurahan": "Gudang",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7993696,
+          -6.6035404
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-15",
+        "facility_code": "FAC-RBI-15",
+        "name": "Sentra Niaga / Pasar RBI #2",
+        "facility_type": "market",
+        "address": "Kel. Babakanpasar, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "NIAGA_PT_25K",
+        "remark": "Pusat Bisnis dan Perdagangan Lainnya",
+        "lcode": "GB0020",
+        "kelurahan": "Babakanpasar",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8115408,
+          -6.6068514
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-16",
+        "facility_code": "FAC-RBI-16",
+        "name": "Sentra Niaga / Pasar RBI #3",
+        "facility_type": "market",
+        "address": "Kel. Baranangsiang, Kec. Bogor Timur, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "NIAGA_PT_25K",
+        "remark": "Pusat Bisnis dan Perdagangan Lainnya",
+        "lcode": "GB0020",
+        "kelurahan": "Baranangsiang",
+        "kecamatan": "Bogor Timur"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7930404,
+          -6.5858663
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-17",
+        "facility_code": "FAC-RBI-17",
+        "name": "Sentra Niaga / Pasar RBI #4",
+        "facility_type": "market",
+        "address": "Kel. Cibogor, Kec. Bogor Tengah, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "NIAGA_PT_25K",
+        "remark": "Pusat Bisnis dan Perdagangan Lainnya",
+        "lcode": "GB0020",
+        "kelurahan": "Cibogor",
+        "kecamatan": "Bogor Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8257409,
+          -6.5455988
+        ]
+      },
+      "properties": {
+        "id": "FAC-RBI-18",
+        "facility_code": "FAC-RBI-18",
+        "name": "Sentra Niaga / Pasar RBI #5",
+        "facility_type": "market",
+        "address": "Kel. Ciluar, Kec. Bogor Utara, Kota Bogor",
+        "source": "Peta RBI Kota Bogor 1:25.000 (Satu Peta)",
+        "verification_status": "verified",
+        "year": 2025,
+        "layer": "NIAGA_PT_25K",
+        "remark": "Pusat Bisnis dan Perdagangan Lainnya",
+        "lcode": "GB0020",
+        "kelurahan": "Ciluar",
+        "kecamatan": "Bogor Utara"
+      }
+    }
+  ]
+}
