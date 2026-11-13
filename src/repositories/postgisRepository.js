@@ -179,8 +179,66 @@ module.exports = {
   },
 
   async findUserByEmail(email) {
-    const { rows } = await db.query('SELECT * FROM users WHERE email = lower($1) AND is_active', [email]);
+    const { rows } = await db.query('SELECT * FROM users WHERE email = lower($1)', [email]);
     return rows[0] || null;
+  },
+  async findUserById(id) {
+    const { rows } = await db.query(
+      `SELECT id, email, name, role, agency, is_active, last_login_at, created_at, updated_at
+       FROM users WHERE id = $1`,
+      [id]
+    );
+    return rows[0] || null;
+  },
+  async findUserAuthById(id) {
+    const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    return rows[0] || null;
+  },
+  async listUsers() {
+    const { rows } = await db.query(
+      `SELECT id, email, name, role, agency, is_active, last_login_at, created_at, updated_at
+       FROM users ORDER BY id ASC`
+    );
+    return rows;
+  },
+  async createUser({ email, name, password_hash, role, agency = 'Pemerintah Kota Bogor', is_active = true }) {
+    const { rows } = await db.query(
+      `INSERT INTO users (email, name, password_hash, role, agency, is_active)
+       VALUES (lower($1), $2, $3, $4, $5, $6)
+       RETURNING id, email, name, role, agency, is_active, last_login_at, created_at, updated_at`,
+      [email, name, password_hash, role, agency, is_active]
+    );
+    return rows[0];
+  },
+  async updateUser(id, patch) {
+    const allowed = ['email', 'name', 'password_hash', 'role', 'agency', 'is_active', 'last_login_at'];
+    const cols = Object.keys(patch).filter((k) => allowed.includes(k));
+    if (!cols.length) return this.findUserById(id);
+    const sets = cols.map((c, i) => (c === 'email' ? `email = lower($${i + 2})` : `${c} = $${i + 2}`)).join(', ');
+    const { rows } = await db.query(
+      `UPDATE users SET ${sets}, updated_at = now() WHERE id = $1
+       RETURNING id, email, name, role, agency, is_active, last_login_at, created_at, updated_at`,
+      [id, ...cols.map((c) => patch[c])]
+    );
+    return rows[0] || null;
+  },
+  async deleteUser(id) {
+    const client = await db.getPool().connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('UPDATE data_uploads SET uploaded_by = NULL WHERE uploaded_by = $1', [id]);
+      await client.query('UPDATE data_uploads SET published_by = NULL WHERE published_by = $1', [id]);
+      await client.query('UPDATE saw_runs SET created_by = NULL WHERE created_by = $1', [id]);
+      await client.query('UPDATE audit_logs SET user_id = NULL WHERE user_id = $1', [id]);
+      const { rows } = await client.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
+      await client.query('COMMIT');
+      return rows.length > 0;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   },
 
   async createUpload(r) {
@@ -255,7 +313,8 @@ module.exports = {
   },
   async listAuditLogs({ limit = 100 } = {}) {
     const { rows } = await db.query(
-      `SELECT l.*, u.email AS user_email FROM audit_logs l LEFT JOIN users u ON u.id = l.user_id
+      `SELECT l.*, u.email AS user_email, u.name AS user_name, u.role AS user_role
+       FROM audit_logs l LEFT JOIN users u ON u.id = l.user_id
        ORDER BY l.created_at DESC LIMIT $1`,
       [limit]
     );

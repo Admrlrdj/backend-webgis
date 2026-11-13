@@ -61,9 +61,15 @@ CREATE TABLE IF NOT EXISTS users (
   name          TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   role          TEXT NOT NULL CHECK (role IN ('admin', 'superadmin')),
+  agency        TEXT NOT NULL DEFAULT 'Pemerintah Kota Bogor',
   is_active     BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  last_login_at TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE users ADD COLUMN IF NOT EXISTS agency TEXT NOT NULL DEFAULT 'Pemerintah Kota Bogor';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
 
 CREATE TABLE IF NOT EXISTS data_uploads (
   id                UUID PRIMARY KEY,

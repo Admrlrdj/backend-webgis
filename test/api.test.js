@@ -2,8 +2,8 @@
 process.env.DATA_SOURCE = 'dummy';
 process.env.ADMIN_EMAIL = 'tester@nutrimap.test';
 process.env.ADMIN_PASSWORD = 'test-password-123';
-process.env.SUPERADMIN_EMAIL = '';
-process.env.SUPERADMIN_PASSWORD = '';
+process.env.SUPERADMIN_EMAIL = 'super@nutrimap.test';
+process.env.SUPERADMIN_PASSWORD = 'super-password-123';
 
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
@@ -190,4 +190,95 @@ test('GET /openapi.json dan GET /docs mengembalikan dokumentasi OpenAPI ala Swag
     assert.match(html, new RegExp(`${prefix}/openapi\\.json`));
     assert.match(html, /layout:\s*'BaseLayout'/);
   }
+});
+
+test('GET /admin/overview menyesuaikan data sesuai role admin vs superadmin', async () => {
+  const adminToken = await login();
+  const rAdmin = await fetch(`${base}/admin/overview`, { headers: { authorization: `Bearer ${adminToken}` } });
+  assert.equal(rAdmin.status, 200);
+  const bAdmin = await rAdmin.json();
+  assert.equal(bAdmin.data.role_scope, 'admin');
+  assert.equal(bAdmin.data.areas_count, 68);
+  assert.equal(bAdmin.data.users_summary, undefined);
+
+  const superLogin = await post('/auth/login', {
+    email: process.env.SUPERADMIN_EMAIL,
+    password: process.env.SUPERADMIN_PASSWORD,
+  });
+  assert.equal(superLogin.status, 200);
+  const rSuper = await fetch(`${base}/admin/overview`, { headers: { authorization: `Bearer ${superLogin.body.token}` } });
+  assert.equal(rSuper.status, 200);
+  const bSuper = await rSuper.json();
+  assert.equal(bSuper.data.role_scope, 'superadmin');
+  assert.ok(bSuper.data.users_summary.total >= 2);
+  assert.ok(Array.isArray(bSuper.data.recent_audit_logs));
+});
+
+test('POST /admin/indicators memperbarui indikator satu kelurahan secara manual', async () => {
+  const token = await login();
+  const res = await post(
+    '/admin/indicators',
+    { area_id: 'KEL-02', indicator_type: 'kemiskinan', year: 2025, value: 9.75, source: 'Verifikasi Lapangan' },
+    token
+  );
+  assert.equal(res.status, 200);
+  assert.equal(res.body.data.value, 9.75);
+  assert.equal((await get('/areas/KEL-02')).body.data.properties.kemiskinan, 9.75);
+});
+
+test('manajemen akun (/admin/users) hanya untuk superadmin & status non-aktif memblokir login', async () => {
+  const adminToken = await login();
+  const denied = await fetch(`${base}/admin/users`, { headers: { authorization: `Bearer ${adminToken}` } });
+  assert.equal(denied.status, 403);
+
+  const superLogin = await post('/auth/login', {
+    email: process.env.SUPERADMIN_EMAIL,
+    password: process.env.SUPERADMIN_PASSWORD,
+  });
+  const superToken = superLogin.body.token;
+
+  const created = await post(
+    '/admin/users',
+    {
+      email: 'surveyor@nutrimap.test',
+      name: 'Petugas Survei',
+      password: 'surveyor-pass-1',
+      role: 'admin',
+      agency: 'Dinas Kesehatan Kota Bogor',
+    },
+    superToken
+  );
+  assert.equal(created.status, 201);
+  const newId = created.body.data.id;
+
+  const surveyorLogin = await post('/auth/login', { email: 'surveyor@nutrimap.test', password: 'surveyor-pass-1' });
+  assert.equal(surveyorLogin.status, 200);
+  assert.equal(surveyorLogin.body.user.agency, 'Dinas Kesehatan Kota Bogor');
+
+  // Ubah kata sandi akun baru oleh dirinya sendiri
+  const chg = await post(
+    '/auth/change-password',
+    { current_password: 'surveyor-pass-1', new_password: 'surveyor-pass-2' },
+    surveyorLogin.body.token
+  );
+  assert.equal(chg.status, 200);
+  const relogin = await post('/auth/login', { email: 'surveyor@nutrimap.test', password: 'surveyor-pass-2' });
+  assert.equal(relogin.status, 200);
+
+  // Superadmin menonaktifkan akun tersebut -> login ditolak 403
+  const patchRes = await fetch(`${base}/admin/users/${newId}`, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${superToken}` },
+    body: JSON.stringify({ is_active: false }),
+  });
+  assert.equal(patchRes.status, 200);
+  const blocked = await post('/auth/login', { email: 'surveyor@nutrimap.test', password: 'surveyor-pass-2' });
+  assert.equal(blocked.status, 403);
+
+  // Superadmin menghapus akun sementara tersebut
+  const delRes = await fetch(`${base}/admin/users/${newId}`, {
+    method: 'DELETE',
+    headers: { authorization: `Bearer ${superToken}` },
+  });
+  assert.equal(delRes.status, 200);
 });

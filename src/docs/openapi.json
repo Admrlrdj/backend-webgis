@@ -153,6 +153,19 @@
           "created_at": { "type": "string", "format": "date-time" },
           "published_at": { "type": "string", "format": "date-time", "nullable": true }
         }
+      },
+      "UserItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "email": { "type": "string", "format": "email", "example": "admin@nutrimap.test" },
+          "name": { "type": "string", "example": "Admin Instansi" },
+          "role": { "type": "string", "enum": ["admin", "superadmin"] },
+          "agency": { "type": "string", "example": "Bappeda Kota Bogor" },
+          "is_active": { "type": "boolean", "example": true },
+          "last_login_at": { "type": ["string", "null"], "format": "date-time" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
       }
     }
   },
@@ -440,8 +453,73 @@
         "summary": "Profil user yang sedang login",
         "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": { "description": "Data user dari token JWT" },
-          "401": { "description": "Token tidak valid / tidak ada" }
+          "200": { "description": "Data user aktual dari database" },
+          "401": { "description": "Token tidak valid / akun non-aktif" }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Ubah kata sandi akun yang sedang login",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["current_password", "new_password"],
+                "properties": {
+                  "current_password": { "type": "string" },
+                  "new_password": { "type": "string", "minLength": 6 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Kata sandi berhasil diperbarui" },
+          "401": { "description": "Kata sandi lama salah" }
+        }
+      }
+    },
+    "/api/admin/overview": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Ringkasan KPI sistem & operasional sesuai role (admin vs superadmin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Ringkasan KPI, upload, SAW run, serta users_summary & audit untuk superadmin" }
+        }
+      }
+    },
+    "/api/admin/indicators": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Pembaruan manual satu nilai indikator kelurahan langsung ke database",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["area_id", "indicator_type", "year", "value"],
+                "properties": {
+                  "area_id": { "type": "string", "example": "KEL-01" },
+                  "indicator_type": { "type": "string", "enum": ["stunting", "kemiskinan", "pangan", "air"] },
+                  "year": { "type": "integer", "example": 2025 },
+                  "value": { "type": "number", "example": 4.8 },
+                  "source": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Nilai indikator kelurahan berhasil diperbarui" },
+          "404": { "description": "Kelurahan tidak ditemukan" }
         }
       }
     },
@@ -569,6 +647,83 @@
         "responses": {
           "201": { "description": "Run SAW tersimpan" },
           "404": { "description": "Tidak ada data indikator untuk tahun tersebut" }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar seluruh akun admin & superadmin dari Supabase (khusus superadmin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Daftar akun pengguna",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/UserItem" } }
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Hanya superadmin yang diizinkan" }
+        }
+      },
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Membuat akun admin/superadmin baru di Supabase (khusus superadmin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "name", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "name": { "type": "string" },
+                  "password": { "type": "string", "minLength": 6 },
+                  "role": { "type": "string", "enum": ["admin", "superadmin"], "default": "admin" },
+                  "agency": { "type": "string" },
+                  "is_active": { "type": "boolean", "default": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Akun berhasil dibuat" },
+          "409": { "description": "Email sudah terdaftar" }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Memperbarui nama, role, instansi, status aktif, atau password akun (khusus superadmin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Akun diperbarui" },
+          "404": { "description": "Akun tidak ditemukan" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Menghapus akun admin/superadmin dari Supabase (khusus superadmin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Akun dihapus" },
+          "404": { "description": "Akun tidak ditemukan" }
         }
       }
     },

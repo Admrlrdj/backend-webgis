@@ -148,17 +148,80 @@ module.exports = {
   },
 
   // ---- users ----
-  async findUserByEmail(email) {
+  _ensureUsers() {
     if (!users) {
+      const now = new Date().toISOString();
       users = config.seedUsers.map((u, i) => ({
         id: i + 1,
         email: u.email.toLowerCase(),
         name: u.name,
         role: u.role,
+        agency: u.role === 'superadmin' ? 'Diskominfo Kota Bogor' : 'Bappeda Kota Bogor',
+        is_active: true,
+        last_login_at: null,
+        created_at: now,
+        updated_at: now,
         password_hash: bcrypt.hashSync(u.password, 10),
       }));
     }
-    return users.find((u) => u.email === String(email).toLowerCase()) || null;
+    return users;
+  },
+  _publicUser(u) {
+    if (!u) return null;
+    const { password_hash: _ph, ...safe } = u;
+    return safe;
+  },
+  async findUserByEmail(email) {
+    const list = this._ensureUsers();
+    return list.find((u) => u.email === String(email).toLowerCase()) || null;
+  },
+  async findUserById(id) {
+    const list = this._ensureUsers();
+    return this._publicUser(list.find((u) => u.id === Number(id)));
+  },
+  async findUserAuthById(id) {
+    const list = this._ensureUsers();
+    return list.find((u) => u.id === Number(id)) || null;
+  },
+  async listUsers() {
+    return this._ensureUsers().map((u) => this._publicUser(u));
+  },
+  async createUser({ email, name, password_hash, role, agency = 'Pemerintah Kota Bogor', is_active = true }) {
+    const list = this._ensureUsers();
+    const now = new Date().toISOString();
+    const nextId = list.reduce((m, u) => Math.max(m, u.id), 0) + 1;
+    const row = {
+      id: nextId,
+      email: String(email).toLowerCase(),
+      name,
+      role,
+      agency,
+      is_active: Boolean(is_active),
+      last_login_at: null,
+      created_at: now,
+      updated_at: now,
+      password_hash,
+    };
+    list.push(row);
+    return this._publicUser(row);
+  },
+  async updateUser(id, patch) {
+    const list = this._ensureUsers();
+    const row = list.find((u) => u.id === Number(id));
+    if (!row) return null;
+    Object.assign(row, {
+      ...patch,
+      ...(patch.email ? { email: String(patch.email).toLowerCase() } : {}),
+      updated_at: new Date().toISOString(),
+    });
+    return this._publicUser(row);
+  },
+  async deleteUser(id) {
+    const list = this._ensureUsers();
+    const idx = list.findIndex((u) => u.id === Number(id));
+    if (idx === -1) return false;
+    list.splice(idx, 1);
+    return true;
   },
 
   // ---- uploads ----
@@ -197,6 +260,18 @@ module.exports = {
     auditLogs.push({ id: auditLogs.length + 1, ...entry, created_at: new Date().toISOString() });
   },
   async listAuditLogs({ limit = 100 } = {}) {
-    return auditLogs.slice(-limit).reverse();
+    const userMap = new Map(this._ensureUsers().map((u) => [u.id, u]));
+    return auditLogs
+      .slice(-limit)
+      .reverse()
+      .map((l) => {
+        const u = userMap.get(l.user_id);
+        return {
+          ...l,
+          user_email: u?.email || null,
+          user_name: u?.name || null,
+          user_role: u?.role || null,
+        };
+      });
   },
 };

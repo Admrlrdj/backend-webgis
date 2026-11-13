@@ -36,10 +36,11 @@ async function main() {
   console.log('Schema siap.');
 
   for (const u of config.seedUsers) {
+    const defaultAgency = u.role === 'superadmin' ? 'Diskominfo Kota Bogor' : 'Bappeda Kota Bogor';
     await db.query(
-      `INSERT INTO users (email, name, password_hash, role) VALUES (lower($1), $2, $3, $4)
-       ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role`,
-      [u.email, u.name, await bcrypt.hash(u.password, 10), u.role]
+      `INSERT INTO users (email, name, password_hash, role, agency) VALUES (lower($1), $2, $3, $4, $5)
+       ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role, agency = COALESCE(NULLIF(users.agency, ''), EXCLUDED.agency), is_active = TRUE`,
+      [u.email, u.name, await bcrypt.hash(u.password, 10), u.role, defaultAgency]
     );
     console.log(`Akun ${u.role} disiapkan: ${u.email}`);
   }

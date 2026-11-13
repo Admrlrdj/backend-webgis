@@ -32,16 +32,23 @@ router.get('/map/administrasi', async (req, res) => {
 // ---- Auth ----
 router.post('/auth/login', auth.login);
 router.get('/auth/me', requireAuth, auth.me);
+router.post('/auth/change-password', requireAuth, auth.changePassword);
 
 // ---- Admin (JWT + role) ----
 const adminRouter = express.Router();
 adminRouter.use(requireAuth, requireRole('admin'));
+adminRouter.get('/overview', admin.getOverview);
+adminRouter.post('/indicators', admin.updateManualIndicator);
 adminRouter.get('/uploads', admin.listUploads);
 adminRouter.post('/uploads', upload.single('file'), admin.createUpload);
 adminRouter.get('/uploads/:id/validation', admin.getUploadValidation);
 adminRouter.post('/uploads/:id/publish', admin.publishUpload);
 adminRouter.post('/uploads/:id/reject', admin.rejectUpload);
 adminRouter.post('/saw/calculate', admin.calculateSaw);
+adminRouter.get('/users', requireRole('superadmin'), admin.listUsers);
+adminRouter.post('/users', requireRole('superadmin'), admin.createUser);
+adminRouter.patch('/users/:id', requireRole('superadmin'), admin.updateUser);
+adminRouter.delete('/users/:id', requireRole('superadmin'), admin.deleteUser);
 adminRouter.get('/audit-logs', requireRole('superadmin'), admin.listAuditLogs);
 router.use('/admin', adminRouter);
 
