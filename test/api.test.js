@@ -167,18 +167,23 @@ test('normalizeWilayah menyamakan variasi ejaan Bappeda dan FSVA', () => {
   assert.equal(normalizeWilayah('KEL. TANAHSEREAL'), normalizeWilayah('Tanah Sareal'));
 });
 
-test('GET /openapi.json dan GET /docs mengembalikan dokumentasi OpenAPI', async () => {
-  const spec = await get('/openapi.json');
-  assert.equal(spec.status, 200);
-  assert.equal(spec.body.openapi, '3.0.3');
-  assert.ok(spec.body.paths['/api/areas']);
-  assert.ok(spec.body.paths['/api/facilities']);
-  assert.ok(spec.body.paths['/api/rankings']);
-  assert.ok(spec.body.paths['/api/admin/uploads']);
+test('GET /openapi.json dan GET /docs mengembalikan dokumentasi OpenAPI ala Swagger BaseLayout', async () => {
+  const rootBase = base.replace(/\/api$/, '');
 
-  const ui = await fetch(`${base}/docs`);
-  assert.equal(ui.status, 200);
-  assert.match(ui.headers.get('content-type') || '', /text\/html/);
-  const html = await ui.text();
-  assert.match(html, /\/api\/openapi\.json/);
+  for (const prefix of ['', '/api']) {
+    const spec = await fetch(`${rootBase}${prefix}/openapi.json`).then(async (r) => ({ status: r.status, body: await r.json() }));
+    assert.equal(spec.status, 200);
+    assert.equal(spec.body.openapi, '3.1.0');
+    assert.ok(spec.body.paths['/api/areas']);
+    assert.ok(spec.body.paths['/api/facilities']);
+    assert.ok(spec.body.paths['/api/rankings']);
+    assert.ok(spec.body.paths['/api/admin/uploads']);
+
+    const ui = await fetch(`${rootBase}${prefix}/docs`);
+    assert.equal(ui.status, 200);
+    assert.match(ui.headers.get('content-type') || '', /text\/html/);
+    const html = await ui.text();
+    assert.match(html, new RegExp(`${prefix}/openapi\\.json`));
+    assert.match(html, /layout:\s*'BaseLayout'/);
+  }
 });

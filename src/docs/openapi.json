@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "NutriMap Bogor REST API",
     "version": "1.0.0",
@@ -29,7 +29,7 @@
         "type": "object",
         "properties": {
           "error": { "type": "string", "example": "Wilayah tidak ditemukan" },
-          "details": { "type": "object", "nullable": true }
+          "details": { "type": ["object", "null"] }
         }
       },
       "MetaInfo": {
@@ -37,9 +37,9 @@
         "properties": {
           "data_source": { "type": "string", "enum": ["postgis", "dummy"] },
           "is_dummy": { "type": "boolean" },
-          "year": { "type": "integer", "nullable": true },
-          "count": { "type": "integer", "nullable": true },
-          "kecamatan": { "type": "string", "nullable": true }
+          "year": { "type": ["integer", "null"] },
+          "count": { "type": ["integer", "null"] },
+          "kecamatan": { "type": ["string", "null"] }
         }
       },
       "AreaProperties": {
@@ -90,8 +90,8 @@
           "source": { "type": "string" },
           "verification_status": { "type": "string" },
           "year": { "type": "integer", "example": 2025 },
-          "kelurahan": { "type": "string", "nullable": true },
-          "kecamatan": { "type": "string", "nullable": true }
+          "kelurahan": { "type": ["string", "null"] },
+          "kecamatan": { "type": ["string", "null"] }
         }
       },
       "FacilityFeatureCollection": {

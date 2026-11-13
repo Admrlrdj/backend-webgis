@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const config = require('./config/env');
 const routes = require('./routes');
+const docs = require('./controllers/docsController');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 function createApp() {
@@ -14,11 +15,13 @@ function createApp() {
     res.json({
       name: 'NutriMap Bogor API',
       data_source: config.dataSource,
-      openapi: '/api/openapi.json',
-      docs: '/api/docs',
+      openapi: '/openapi.json',
+      docs: '/docs',
       health: '/api/health',
     })
   );
+  app.get('/openapi.json', docs.getOpenApiJson);
+  app.get('/docs', docs.getSwaggerUi);
   app.use('/api', routes);
 
   app.use(notFoundHandler);
