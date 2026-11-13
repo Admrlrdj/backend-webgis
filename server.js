@@ -1,25 +1,14 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+const config = require('./src/config/env');
+const { createApp } = require('./src/app');
 
-const mapRoutes = require('./routes/mapRoutes');
+const app = createApp();
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Middleware
-app.use(cors()); // Mengizinkan request dari frontend React
-app.use(express.json());
-
-// Route default untuk halaman utama
-app.get('/', (req, res) => {
-    res.send('Server Backend WebGIS berjalan dengan lancar!');
-});
-
-// Routes
-app.use('/api/maps', mapRoutes);
-
-// Jalankan Server
-app.listen(PORT, () => {
-    console.log(`Server WebGIS berjalan di http://localhost:${PORT}`);
+app.listen(config.port, () => {
+  console.log(`NutriMap API berjalan di http://localhost:${config.port} (data source: ${config.dataSource})`);
+  if (config.dataSource === 'dummy') {
+    console.log('  Mode DUMMY: GeoJSON contoh dari data/dummy, perubahan disimpan di memori saja.');
+  }
+  if (!config.seedUsers.length) {
+    console.log('  Belum ada akun admin. Isi ADMIN_EMAIL dan ADMIN_PASSWORD di .env untuk login.');
+  }
 });

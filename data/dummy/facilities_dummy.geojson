@@ -1,0 +1,380 @@
+{
+  "type": "FeatureCollection",
+  "name": "facilities_dummy",
+  "metadata": {
+    "nama_dataset": "Fasilitas Pendukung (DUMMY)",
+    "sumber": "Titik contoh di sekitar pusat kelurahan - bukan lokasi terverifikasi",
+    "status_validasi": "dummy",
+    "generated_at": "2026-11-06T01:54:20.037Z"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "FAC-001",
+      "properties": {
+        "id": "FAC-001",
+        "name": "Pasar Bogor (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Babakan Pasar",
+        "kecamatan": "Bogor Tengah",
+        "address": "Kel. Babakan Pasar, Kec. Bogor Tengah",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8013,
+          -6.6007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-002",
+      "properties": {
+        "id": "FAC-002",
+        "name": "Pasar Anyar (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Kebon Kelapa",
+        "kecamatan": "Bogor Tengah",
+        "address": "Kel. Kebon Kelapa, Kec. Bogor Tengah",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.781,
+          -6.5893
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-003",
+      "properties": {
+        "id": "FAC-003",
+        "name": "Pasar Gunung Batu (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Gunungbatu",
+        "kecamatan": "Bogor Barat",
+        "address": "Kel. Gunungbatu, Kec. Bogor Barat",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7779,
+          -6.5927
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-004",
+      "properties": {
+        "id": "FAC-004",
+        "name": "Pasar Jambu Dua (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Tanahsareal",
+        "kecamatan": "Tanah Sareal",
+        "address": "Kel. Tanahsareal, Kec. Tanah Sareal",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7975,
+          -6.5779
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-005",
+      "properties": {
+        "id": "FAC-005",
+        "name": "Pasar Merdeka (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Ciwaringin",
+        "kecamatan": "Bogor Tengah",
+        "address": "Kel. Ciwaringin, Kec. Bogor Tengah",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7857,
+          -6.5868
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-006",
+      "properties": {
+        "id": "FAC-006",
+        "name": "Pasar Sukasari (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Sukasari",
+        "kecamatan": "Bogor Timur",
+        "address": "Kel. Sukasari, Kec. Bogor Timur",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8157,
+          -6.615
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-007",
+      "properties": {
+        "id": "FAC-007",
+        "name": "Pasar Cumpok (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Batutulis",
+        "kecamatan": "Bogor Selatan",
+        "address": "Kel. Batutulis, Kec. Bogor Selatan",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8073,
+          -6.6225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-008",
+      "properties": {
+        "id": "FAC-008",
+        "name": "Pasar Kebon Pedes (contoh)",
+        "facility_type": "market",
+        "kelurahan": "Kebonpedes",
+        "kecamatan": "Tanah Sareal",
+        "address": "Kel. Kebonpedes, Kec. Tanah Sareal",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7936,
+          -6.5732
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-009",
+      "properties": {
+        "id": "FAC-009",
+        "name": "Instalasi Pengolahan Air (contoh)",
+        "facility_type": "water_facility",
+        "kelurahan": "Katulampa",
+        "kecamatan": "Bogor Timur",
+        "address": "Kel. Katulampa, Kec. Bogor Timur",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8411,
+          -6.6246
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-010",
+      "properties": {
+        "id": "FAC-010",
+        "name": "Reservoir Air (contoh)",
+        "facility_type": "water_facility",
+        "kelurahan": "Pakuan",
+        "kecamatan": "Bogor Selatan",
+        "address": "Kel. Pakuan, Kec. Bogor Selatan",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8204,
+          -6.6271
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-011",
+      "properties": {
+        "id": "FAC-011",
+        "name": "Kantor Layanan Air (contoh)",
+        "facility_type": "water_facility",
+        "kelurahan": "Tegallega",
+        "kecamatan": "Bogor Tengah",
+        "address": "Kel. Tegallega, Kec. Bogor Tengah",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8115,
+          -6.6003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-012",
+      "properties": {
+        "id": "FAC-012",
+        "name": "Hidran Umum (contoh)",
+        "facility_type": "water_facility",
+        "kelurahan": "Mulyaharja",
+        "kecamatan": "Bogor Selatan",
+        "address": "Kel. Mulyaharja, Kec. Bogor Selatan",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7843,
+          -6.6437
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-013",
+      "properties": {
+        "id": "FAC-013",
+        "name": "Hidran Umum (contoh)",
+        "facility_type": "water_facility",
+        "kelurahan": "Situgede",
+        "kecamatan": "Bogor Barat",
+        "address": "Kel. Situgede, Kec. Bogor Barat",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.744,
+          -6.5644
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-014",
+      "properties": {
+        "id": "FAC-014",
+        "name": "Puskesmas (contoh)",
+        "facility_type": "puskesmas",
+        "kelurahan": "Bojongkerta",
+        "kecamatan": "Bogor Selatan",
+        "address": "Kel. Bojongkerta, Kec. Bogor Selatan",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8244,
+          -6.6536
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-015",
+      "properties": {
+        "id": "FAC-015",
+        "name": "Puskesmas (contoh)",
+        "facility_type": "puskesmas",
+        "kelurahan": "Cimahpar",
+        "kecamatan": "Bogor Utara",
+        "address": "Kel. Cimahpar, Kec. Bogor Utara",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8314,
+          -6.5717
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "FAC-016",
+      "properties": {
+        "id": "FAC-016",
+        "name": "Puskesmas (contoh)",
+        "facility_type": "puskesmas",
+        "kelurahan": "Pasirjaya",
+        "kecamatan": "Bogor Barat",
+        "address": "Kel. Pasirjaya, Kec. Bogor Barat",
+        "source": "Data contoh (dummy)",
+        "verification_status": "dummy",
+        "year": 2025,
+        "is_dummy": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7748,
+          -6.6084
+        ]
+      }
+    }
+  ]
+}
