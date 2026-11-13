@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const config = require('../config/env');
 const pub = require('../controllers/publicController');
+const docs = require('../controllers/docsController');
 const auth = require('../controllers/authController');
 const admin = require('../controllers/adminController');
 const { requireAuth, requireRole } = require('../middleware/auth');
@@ -19,6 +20,8 @@ router.get('/indicators', pub.getIndicator);
 router.get('/facilities', pub.listFacilities);
 router.get('/rankings', pub.getRankings);
 router.get('/metadata', pub.getMetadata);
+router.get('/openapi.json', docs.getOpenApiJson);
+router.get('/docs', docs.getSwaggerUi);
 
 // Alias lama dari prototipe awal (GET /api/map/administrasi) agar klien lama tetap jalan
 router.get('/map/administrasi', async (req, res) => {

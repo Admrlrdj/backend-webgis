@@ -166,3 +166,19 @@ test('normalizeWilayah menyamakan variasi ejaan Bappeda dan FSVA', () => {
   assert.equal(normalizeWilayah('KEL. TEGALEGA'), normalizeWilayah('Tegallega'));
   assert.equal(normalizeWilayah('KEL. TANAHSEREAL'), normalizeWilayah('Tanah Sareal'));
 });
+
+test('GET /openapi.json dan GET /docs mengembalikan dokumentasi OpenAPI', async () => {
+  const spec = await get('/openapi.json');
+  assert.equal(spec.status, 200);
+  assert.equal(spec.body.openapi, '3.0.3');
+  assert.ok(spec.body.paths['/api/areas']);
+  assert.ok(spec.body.paths['/api/facilities']);
+  assert.ok(spec.body.paths['/api/rankings']);
+  assert.ok(spec.body.paths['/api/admin/uploads']);
+
+  const ui = await fetch(`${base}/docs`);
+  assert.equal(ui.status, 200);
+  assert.match(ui.headers.get('content-type') || '', /text\/html/);
+  const html = await ui.text();
+  assert.match(html, /\/api\/openapi\.json/);
+});

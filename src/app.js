@@ -10,7 +10,15 @@ function createApp() {
   app.use(cors({ origin: config.corsOrigin }));
   app.use(express.json({ limit: '1mb' }));
 
-  app.get('/', (_req, res) => res.json({ name: 'NutriMap Bogor API', data_source: config.dataSource, docs: '/api/health' }));
+  app.get('/', (_req, res) =>
+    res.json({
+      name: 'NutriMap Bogor API',
+      data_source: config.dataSource,
+      openapi: '/api/openapi.json',
+      docs: '/api/docs',
+      health: '/api/health',
+    })
+  );
   app.use('/api', routes);
 
   app.use(notFoundHandler);

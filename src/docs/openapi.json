@@ -1,0 +1,590 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NutriMap Bogor REST API",
+    "version": "1.0.0",
+    "description": "REST API geospasial dan analisis prioritas intervensi gizi/ketahanan pangan (SAW) untuk 68 kelurahan di Kota Bogor berbasis Express dan Supabase PostGIS."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local Development Server"
+    }
+  ],
+  "tags": [
+    { "name": "Public", "description": "Endpoint publik read-only tanpa autentikasi" },
+    { "name": "Auth", "description": "Autentikasi JWT admin & superadmin" },
+    { "name": "Admin", "description": "Upload data CSV, publikasi, eksekusi SAW, dan audit log" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "example": "Wilayah tidak ditemukan" },
+          "details": { "type": "object", "nullable": true }
+        }
+      },
+      "MetaInfo": {
+        "type": "object",
+        "properties": {
+          "data_source": { "type": "string", "enum": ["postgis", "dummy"] },
+          "is_dummy": { "type": "boolean" },
+          "year": { "type": "integer", "nullable": true },
+          "count": { "type": "integer", "nullable": true },
+          "kecamatan": { "type": "string", "nullable": true }
+        }
+      },
+      "AreaProperties": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "KEL-01" },
+          "kode_wilayah": { "type": "string", "example": "32.71.03.1005" },
+          "nama": { "type": "string", "example": "Babakan" },
+          "kecamatan": { "type": "string", "example": "Bogor Tengah" },
+          "stunting": { "type": "number", "example": 5.08 },
+          "kemiskinan": { "type": "number", "example": 5.94 },
+          "kerentananPangan": { "type": "number", "example": 29.95 },
+          "airBersih": { "type": "number", "example": 7.26 },
+          "lat": { "type": "number", "example": -6.589576 },
+          "lng": { "type": "number", "example": 106.805589 },
+          "year": { "type": "integer", "example": 2025 },
+          "is_dummy": { "type": "boolean", "example": false }
+        }
+      },
+      "AreaFeature": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["Feature"] },
+          "geometry": { "type": "object" },
+          "properties": { "$ref": "#/components/schemas/AreaProperties" }
+        }
+      },
+      "AreaFeatureCollection": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["FeatureCollection"] },
+          "features": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AreaFeature" }
+          }
+        }
+      },
+      "FacilityProperties": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "FAC-RBI-01" },
+          "name": { "type": "string", "example": "Rumah Sakit Salak Bogor" },
+          "facility_type": {
+            "type": "string",
+            "enum": ["market", "water_facility", "puskesmas", "posyandu", "agricultural_area"]
+          },
+          "address": { "type": "string" },
+          "source": { "type": "string" },
+          "verification_status": { "type": "string" },
+          "year": { "type": "integer", "example": 2025 },
+          "kelurahan": { "type": "string", "nullable": true },
+          "kecamatan": { "type": "string", "nullable": true }
+        }
+      },
+      "FacilityFeatureCollection": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["FeatureCollection"] },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string", "enum": ["Feature"] },
+                "geometry": { "type": "object" },
+                "properties": { "$ref": "#/components/schemas/FacilityProperties" }
+              }
+            }
+          }
+        }
+      },
+      "SawRankingItem": {
+        "type": "object",
+        "properties": {
+          "rank": { "type": "integer", "example": 1 },
+          "area_id": { "type": "string", "example": "KEL-01" },
+          "kode_wilayah": { "type": "string", "example": "32.71.03.1005" },
+          "nama": { "type": "string", "example": "Babakan" },
+          "kecamatan": { "type": "string", "example": "Bogor Tengah" },
+          "values": {
+            "type": "object",
+            "properties": {
+              "stunting": { "type": "number" },
+              "kemiskinan": { "type": "number" },
+              "pangan": { "type": "number" },
+              "air": { "type": "number" }
+            }
+          },
+          "normalized": { "type": "object" },
+          "contributions": { "type": "object" },
+          "intervention_score": { "type": "number", "example": 0.7911 },
+          "condition_score": { "type": "number" },
+          "main_driver": { "type": "string" },
+          "priority_level": { "type": "string", "enum": ["tinggi", "sedang", "rendah"] },
+          "zona": { "type": "string", "enum": ["merah", "kuning", "hijau"] },
+          "label": { "type": "string" }
+        }
+      },
+      "UploadSummary": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "filename": { "type": "string" },
+          "indicator_type": { "type": "string", "enum": ["stunting", "kemiskinan", "pangan", "air"] },
+          "source": { "type": "string" },
+          "period": { "type": "integer" },
+          "status": { "type": "string", "enum": ["pending", "published", "rejected"] },
+          "valid_row_count": { "type": "integer" },
+          "invalid_row_count": { "type": "integer" },
+          "unmatched_row_count": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "published_at": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Health check API dan status koneksi database PostGIS",
+        "responses": {
+          "200": {
+            "description": "API dan database sehat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "data_source": { "type": "string", "example": "postgis" },
+                    "db": { "type": "object" },
+                    "time": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "503": { "description": "Database tidak terhubung / degraded" }
+        }
+      }
+    },
+    "/api/areas": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Daftar batas poligon kelurahan (GeoJSON FeatureCollection) beserta nilai 4 indikator",
+        "parameters": [
+          { "name": "kecamatan", "in": "query", "schema": { "type": "string" }, "description": "Filter nama kecamatan (opsional)" },
+          { "name": "year", "in": "query", "schema": { "type": "integer" }, "description": "Tahun indikator (kosong = snapshot terbaru per indikator)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "FeatureCollection kelurahan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/AreaFeatureCollection" },
+                    "meta": { "$ref": "#/components/schemas/MetaInfo" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/areas/{id}": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Detail GeoJSON satu kelurahan berdasarkan area_code atau kode_wilayah",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "KEL-01" },
+          { "name": "year", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail kelurahan ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/AreaFeature" },
+                    "meta": { "$ref": "#/components/schemas/MetaInfo" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Wilayah tidak ditemukan",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/indicators": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Layer tematik dan statistik deskriptif untuk satu indikator",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "enum": ["stunting", "kemiskinan", "pangan", "air"] }
+          },
+          { "name": "year", "in": "query", "schema": { "type": "integer" } },
+          { "name": "kecamatan", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "GeoJSON tematik + statistik min/max/mean indikator",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/AreaFeatureCollection" },
+                    "indicator": { "type": "string" },
+                    "label": { "type": "string" },
+                    "unit": { "type": "string" },
+                    "year": { "type": "integer" },
+                    "source": { "type": "string" },
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "count": { "type": "integer" },
+                        "min": { "type": "number" },
+                        "max": { "type": "number" },
+                        "mean": { "type": "number" }
+                      }
+                    },
+                    "meta": { "$ref": "#/components/schemas/MetaInfo" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Parameter type tidak valid" }
+        }
+      }
+    },
+    "/api/facilities": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Overlay titik fasilitas kesehatan, rumah sakit, dan niaga/pasar (GeoJSON Point)",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["market", "water_facility", "puskesmas", "posyandu", "agricultural_area"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FeatureCollection titik fasilitas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/FacilityFeatureCollection" },
+                    "meta": { "$ref": "#/components/schemas/MetaInfo" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Jenis fasilitas tidak dikenal" }
+        }
+      }
+    },
+    "/api/rankings": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Pemeringkatan prioritas wilayah menggunakan Simple Additive Weighting (SAW)",
+        "parameters": [
+          { "name": "year", "in": "query", "schema": { "type": "integer" } },
+          { "name": "w_stunting", "in": "query", "schema": { "type": "number", "default": 40 } },
+          { "name": "w_kemiskinan", "in": "query", "schema": { "type": "number", "default": 25 } },
+          { "name": "w_pangan", "in": "query", "schema": { "type": "number", "default": 20 } },
+          { "name": "w_air", "in": "query", "schema": { "type": "number", "default": 15 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar peringkat 68 kelurahan + bobot ternormalisasi + ringkasan zona",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/SawRankingItem" } },
+                    "weights": { "type": "object" },
+                    "criteria": { "type": "array", "items": { "type": "object" } },
+                    "summary": { "type": "object" },
+                    "skipped": { "type": "array", "items": { "type": "object" } },
+                    "year": { "type": "integer" },
+                    "meta": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/metadata": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Metadata katalog indikator, daftar tahun, kecamatan, jumlah kelurahan, dan bobot default",
+        "responses": {
+          "200": { "description": "Metadata aplikasi NutriMap" }
+        }
+      }
+    },
+    "/api/map/administrasi": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Alias kompatibilitas prototipe awal untuk GeoJSON FeatureCollection kelurahan",
+        "responses": {
+          "200": {
+            "description": "GeoJSON FeatureCollection",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AreaFeatureCollection" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/openapi.json": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Spesifikasi OpenAPI 3.0.3 JSON untuk NutriMap Bogor API",
+        "responses": {
+          "200": { "description": "Dokumen OpenAPI JSON" }
+        }
+      }
+    },
+    "/api/docs": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Dokumentasi interaktif Swagger UI",
+        "responses": {
+          "200": { "description": "Halaman HTML Swagger UI" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login akun admin/superadmin untuk mendapatkan token JWT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Berhasil login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string" },
+                    "token_type": { "type": "string", "example": "Bearer" },
+                    "expires_in": { "type": "string" },
+                    "user": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Email/password kosong" },
+          "401": { "description": "Kredensial tidak valid" }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Profil user yang sedang login",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Data user dari token JWT" },
+          "401": { "description": "Token tidak valid / tidak ada" }
+        }
+      }
+    },
+    "/api/admin/uploads": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar riwayat upload dataset indikator",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List upload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/UploadSummary" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Upload CSV indikator untuk validasi (status awal: pending)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file", "indicator_type", "year"],
+                "properties": {
+                  "file": { "type": "string", "format": "binary" },
+                  "indicator_type": { "type": "string", "enum": ["stunting", "kemiskinan", "pangan", "air"] },
+                  "year": { "type": "integer", "example": 2025 },
+                  "source": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Upload tervalidasi dan tersimpan sebagai pending" },
+          "400": { "description": "File atau parameter tidak valid" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" }
+        }
+      }
+    },
+    "/api/admin/uploads/{id}/validation": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Detail hasil validasi baris CSV untuk satu upload",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Detail validasi" },
+          "404": { "description": "Upload tidak ditemukan" }
+        }
+      }
+    },
+    "/api/admin/uploads/{id}/publish": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Mempublikasikan baris CSV valid ke tabel indicators produksi",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Berhasil dipublikasikan" },
+          "404": { "description": "Upload tidak ditemukan" },
+          "409": { "description": "Upload sudah berstatus published/rejected" }
+        }
+      }
+    },
+    "/api/admin/uploads/{id}/reject": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Menolak/membatalkan upload CSV yang masih pending",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Upload ditolak" },
+          "404": { "description": "Upload tidak ditemukan" },
+          "409": { "description": "Status bukan pending" }
+        }
+      }
+    },
+    "/api/admin/saw/calculate": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Menghitung dan menyimpan snapshot run SAW ke database",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "year": { "type": "integer", "example": 2025 },
+                  "weight_version": { "type": "string" },
+                  "weights": {
+                    "type": "object",
+                    "properties": {
+                      "stunting": { "type": "number", "example": 40 },
+                      "kemiskinan": { "type": "number", "example": 25 },
+                      "pangan": { "type": "number", "example": 20 },
+                      "air": { "type": "number", "example": 15 }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Run SAW tersimpan" },
+          "404": { "description": "Tidak ada data indikator untuk tahun tersebut" }
+        }
+      }
+    },
+    "/api/admin/audit-logs": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar log aktivitas sistem (khusus role superadmin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 100, "maximum": 500 } }
+        ],
+        "responses": {
+          "200": { "description": "Daftar audit log" },
+          "403": { "description": "Hanya superadmin yang diizinkan" }
+        }
+      }
+    }
+  }
+}
