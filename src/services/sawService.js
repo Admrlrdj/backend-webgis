@@ -17,7 +17,13 @@ const DEFAULT_WEIGHTS = { stunting: 0.4, kemiskinan: 0.25, pangan: 0.2, air: 0.1
 const WEIGHT_VERSION_DEFAULT = 'default-v1';
 
 function normalizeWeights(input) {
-  const raw = { ...DEFAULT_WEIGHTS, ...(input || {}) };
+  const src = input || {};
+  const mapped = {
+    ...src,
+    ...(src.pangan === undefined && src.kerentananPangan !== undefined ? { pangan: src.kerentananPangan } : {}),
+    ...(src.air === undefined && src.airBersih !== undefined ? { air: src.airBersih } : {}),
+  };
+  const raw = { ...DEFAULT_WEIGHTS, ...mapped };
   const weights = {};
   for (const id of Object.keys(INDICATORS)) {
     const w = Number(raw[id]);

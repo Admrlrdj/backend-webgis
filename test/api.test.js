@@ -100,6 +100,10 @@ test('SAW: benefit x/max, cost min/x', () => {
   assert.equal(r.ranking[0].intervention_score, 1);
   assert.equal(r.ranking[1].intervention_score, 0.575); // (0.5+0.5+0.5+0.8)/4
   assert.throws(() => saw.calculate(rows, { stunting: -1 }));
+
+  const aliasWeights = saw.normalizeWeights({ stunting: 40, kemiskinan: 25, kerentananPangan: 20, airBersih: 15 });
+  assert.equal(aliasWeights.pangan, 0.2);
+  assert.equal(aliasWeights.air, 0.15);
 });
 
 test('endpoint admin butuh token', async () => {

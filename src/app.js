@@ -8,7 +8,19 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 function createApp() {
   const app = express();
   app.disable('x-powered-by');
-  app.use(cors({ origin: config.corsOrigin }));
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin || config.corsOrigin === '*') return callback(null, true);
+        const allowed = Array.isArray(config.corsOrigin) ? config.corsOrigin : [config.corsOrigin];
+        if (allowed.includes(origin)) return callback(null, true);
+        if (!config.isProduction && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
+      },
+    })
+  );
   app.use(express.json({ limit: '1mb' }));
 
   app.get('/', (_req, res) =>
